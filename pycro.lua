@@ -14,6 +14,7 @@ end
 function onSave(bp)
     if bp.Buf:FileType() == "python" then
        pyfmt(bp)
+       isort(bp)
     end
     return true
 end
@@ -21,6 +22,16 @@ end
 function pyfmt(bp)
     bp:Save()
     local _, err = shell.RunCommand("black " .. bp.Buf.Path)
+    if err ~= nil then
+        micro.InfoBar():Error(err)
+        return
+    end
+    bp.Buf:ReOpen()
+end
+
+function isort(bp)
+    bp:Save()
+    local _, err = shell.RunCommand("isort -y -ac")
     if err ~= nil then
         micro.InfoBar():Error(err)
         return
